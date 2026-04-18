@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { MOCK_DATA, fmtNum, fmtCost } from "./data";
+import { MOCK_DATA, fetchUsageData, fmtNum, fmtCost } from "./data";
 import { SummaryCell, Chart7dCell, ModelCell, Trend24hCell, CountdownCell, SessionsCell } from "./components/Cells";
 import { ExpSummary, ExpChart7d, ExpModel, ExpTrend24h, ExpCountdown, ExpSessions } from "./components/Expanded";
 import "./App.css";
@@ -14,26 +14,23 @@ function useTick(ms = 1000) {
   return t;
 }
 
-function useLiveData(base) {
-  const [data, setData] = useState(base);
+function useData() {
+  const [data, setData] = useState(MOCK_DATA);
+  const [isLive, setIsLive] = useState(false);
+
   useEffect(() => {
-    const i = setInterval(() => {
-      setData(prev => {
-        const next = { ...prev, models: prev.models.map(m => ({ ...m })) };
-        const idx = Math.floor(Math.random() * next.models.length);
-        const bump = Math.floor(Math.random() * 4000 + 500);
-        next.models[idx] = {
-          ...next.models[idx],
-          used: next.models[idx].used + bump,
-          sessions_today: Math.random() > 0.7 ? next.models[idx].sessions_today + 1 : next.models[idx].sessions_today,
-          last_used: Math.random() > 0.7 ? "just now" : next.models[idx].last_used,
-        };
-        return next;
-      });
-    }, 2200);
-    return () => clearInterval(i);
+    let active = true;
+    async function load() {
+      const real = await fetchUsageData();
+      if (!active) return;
+      if (real) { setData(real); setIsLive(true); }
+    }
+    load();
+    const t = setInterval(load, 30_000);
+    return () => { active = false; clearInterval(t); };
   }, []);
-  return data;
+
+  return { data, isLive };
 }
 
 function Timestamp() {
@@ -169,7 +166,7 @@ function TweaksPanel({ open, onClose, state, setState }) {
 
 // ---------- App ----------
 export default function App() {
-  const data = useLiveData(MOCK_DATA);
+  const { data, isLive } = useData();
   const { activeId, cloneState, expand, collapse } = useExpander();
 
   const [tweaks, setTweaks] = useState({
@@ -202,7 +199,7 @@ export default function App() {
           </div>
         </div>
         <div className="topbar-right">
-          <span className="live-chip"><span className="live-dot" /> LIVE · MOCK</span>
+          <span className="live-chip"><span className="live-dot" /> {isLive ? "LIVE · LOCAL" : "MOCK"}</span>
           <Timestamp />
           <button className="tweaks-toggle" onClick={() => setTweaksOpen(o => !o)}>TWEAKS</button>
         </div>

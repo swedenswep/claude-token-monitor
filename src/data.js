@@ -83,6 +83,20 @@ export const MOCK_DATA = {
   ],
 };
 
+// Fetch real usage data from the local Vite API endpoint.
+// Returns null when unavailable (caller falls back to MOCK_DATA).
+export async function fetchUsageData() {
+  try {
+    const res = await fetch('/api/usage');
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.error || !Array.isArray(data.models)) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 // Helpers
 export function fmtNum(n) {
   if (n == null) return "—";
