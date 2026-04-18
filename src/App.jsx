@@ -123,6 +123,29 @@ function CloneView({ activeId, cloneState, collapse, data, totals }) {
   );
 }
 
+// ---------- Weekly usage bar ----------
+function WeeklyBar({ weekly }) {
+  if (!weekly || weekly.avg_4w === 0) return null;
+  const { current, avg_4w } = weekly;
+  const pct = Math.round(current / avg_4w * 100);
+  const over = pct > 100;
+  const fillW = Math.min(pct, 100);
+  const barColor = over ? "var(--danger)" : pct > 75 ? "var(--warn)" : "var(--accent)";
+
+  return (
+    <div className="weekly-bar">
+      <div className="weekly-bar-labels">
+        <span className="weekly-bar-title">THIS WEEK VS 4W AVG</span>
+        <span className="weekly-bar-nums">{fmtNum(current)} / avg {fmtNum(avg_4w)}</span>
+        <span className="weekly-bar-pct" style={{ color: barColor }}>{pct}%</span>
+      </div>
+      <div className="weekly-bar-track">
+        <div className="weekly-bar-fill" style={{ width: fillW + "%", background: barColor }} />
+      </div>
+    </div>
+  );
+}
+
 // ---------- Tweaks panel ----------
 function TweaksPanel({ open, onClose, state, setState }) {
   const set = (k, v) => {
@@ -204,6 +227,8 @@ export default function App() {
           <button className="tweaks-toggle" onClick={() => setTweaksOpen(o => !o)}>TWEAKS</button>
         </div>
       </div>
+
+      <WeeklyBar weekly={data.weekly} />
 
       <div className="bento">
         <SummaryCell data={data} totals={totals} onExpand={expand} />

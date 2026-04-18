@@ -192,6 +192,55 @@ button { font-family: inherit; color: inherit; background: none; border: 0; curs
 }
 .tweaks-toggle:hover { background: var(--bg-hover); color: var(--text); }
 
+/* ============== Weekly bar ============== */
+.weekly-bar {
+  padding: 10px var(--pad) 11px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+}
+
+.weekly-bar-labels {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.weekly-bar-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.weekly-bar-nums {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.weekly-bar-pct {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.weekly-bar-track {
+  height: 3px;
+  background: var(--bg-hover);
+  border-radius: 2px;
+  overflow: visible;
+  position: relative;
+}
+
+.weekly-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.7s var(--ease), background 0.3s;
+}
+
 /* ============== Bento grid ============== */
 .bento {
   display: grid;

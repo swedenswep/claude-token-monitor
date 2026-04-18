@@ -115,7 +115,8 @@ async function aggregateUsage() {
   // { modelId: { name, tier, ip, op, input, output, cacheRead, cacheWrite,
   //              byDay, byHour, sessions, sessionsToday, lastUsed } }
   const mStats = {};
-  const pStats = {}; // { projName: tokens }
+  const pStats   = {}; // { projName: tokens }
+  const allByDay = {}; // all-time daily totals for weekly comparison
   const rawSessions = [];
 
   const files = [];
@@ -157,6 +158,9 @@ async function aggregateUsage() {
       const cr  = u.cache_read_input_tokens || 0;
       const cw  = u.cache_creation_input_tokens || 0;
       const tok = inp + out;
+
+      // Track all-time daily totals (needed for 4-week look-back)
+      allByDay[localDate(ts)] = (allByDay[localDate(ts)] || 0) + tok;
 
       if (inCycle) {
         const m = mStats[mid];
@@ -248,6 +252,26 @@ async function aggregateUsage() {
     .slice(0, 8)
     .map(({ _ts, ...s }) => s);
 
+  // ── Weekly comparison (current week vs avg of past 4 complete weeks) ─────────
+  function weekStart(date) {
+    const d = new Date(date);
+    const dow = (d.getDay() + 6) % 7; // 0 = Mon
+    d.setDate(d.getDate() - dow);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  const thisWeekStart = weekStart(now);
+  let currentWeekTok = 0;
+  const pastWeekTok = [0, 0, 0, 0];
+  for (const [dk, tokens] of Object.entries(allByDay)) {
+    const ws = weekStart(new Date(dk + 'T12:00:00')); // noon avoids DST edge cases
+    const weeksAgo = Math.round((thisWeekStart - ws) / (7 * 86_400_000));
+    if (weeksAgo === 0) currentWeekTok += tokens;
+    else if (weeksAgo >= 1 && weeksAgo <= 4) pastWeekTok[weeksAgo - 1] += tokens;
+  }
+  const avg4w = Math.round(pastWeekTok.reduce((s, v) => s + v, 0) / 4);
+  const weekly = { current: currentWeekTok, avg_4w: avg4w };
+
   // ── Billing cycle label ─────────────────────────────────────────────────────
   const cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   const pad = n => String(n).padStart(2, '0');
@@ -265,6 +289,7 @@ async function aggregateUsage() {
     recent_sessions,
     alerts: [],
     projects,
+    weekly,
   };
 }
 
