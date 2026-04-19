@@ -150,43 +150,57 @@ function StackedBars({ data }) {
     sonnet: "oklch(0.82 0.15 75)",
     haiku: "oklch(0.78 0.14 155)",
   };
-  const days = data.daily_breakdown.length;
-  const max = Math.max(...data.daily_breakdown.map((_, i) =>
+  const BAR_H = 200;
+  const totals = data.daily_breakdown.map((_, i) =>
     data.models.reduce((s, m) => s + m.daily_7d[i], 0)
-  ));
+  );
+  const max = Math.max(...totals);
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(${days}, 1fr)`, gap: 14, marginTop: 18, alignItems: "end", height: 260 }}>
-      {data.daily_breakdown.map((d, i) => {
-        const segs = data.models.map(m => ({
-          id: m.id,
-          value: m.daily_7d[i],
-        }));
-        const total = segs.reduce((s, x) => s + x.value, 0);
-        const heightPct = (total / max) * 100;
-        return (
-          <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, height: "100%", justifyContent: "flex-end" }}>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--text-muted)" }}>{fmtNum(total)}</div>
-            <div style={{
-              width: "100%", maxWidth: 54,
-              height: heightPct + "%",
-              display: "flex", flexDirection: "column",
-              borderRadius: "8px 8px 4px 4px",
-              overflow: "hidden",
-              border: "1px solid var(--border)",
-            }}>
-              {segs.map(s => (
-                <div key={s.id} style={{
-                  flex: s.value,
-                  background: colors[s.id],
-                  opacity: 0.9,
-                }} />
-              ))}
+    <div style={{ marginTop: 18 }}>
+      {/* Bar area — fixed height, bars sized in px to avoid % height in flex */}
+      <div style={{ display: "flex", gap: 14, height: BAR_H, alignItems: "flex-end" }}>
+        {data.daily_breakdown.map((d, i) => {
+          const segs = data.models.map(m => ({ id: m.id, value: m.daily_7d[i] }));
+          const barH = Math.max(Math.round((totals[i] / max) * BAR_H), 4);
+          return (
+            <div key={i} style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "flex-end", height: "100%" }}>
+              <div style={{
+                width: "100%", maxWidth: 54,
+                height: barH,
+                display: "flex", flexDirection: "column",
+                borderRadius: "8px 8px 4px 4px",
+                overflow: "hidden",
+              }}>
+                {segs.map(s => (
+                  <div key={s.id} style={{ flex: s.value, background: colors[s.id] }} />
+                ))}
+              </div>
             </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-muted)" }}>{d.label}</div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-dim)" }}>{d.day}</div>
+          );
+        })}
+      </div>
+
+      {/* Labels row — completely separate from bar area */}
+      <div style={{ display: "flex", gap: 14, marginTop: 10 }}>
+        {data.daily_breakdown.map(({ label, day }, i) => (
+          <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-muted)" }}>{fmtNum(totals[i])}</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-muted)" }}>{label}</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-dim)" }}>{day}</span>
           </div>
-        );
-      })}
+        ))}
+      </div>
+
+      {/* Legend */}
+      <div style={{ display: "flex", gap: 16, marginTop: 16, fontFamily: "var(--font-mono)", fontSize: 11.5, color: "var(--text-muted)" }}>
+        {data.models.map(m => (
+          <span key={m.id} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: colors[m.id] }} />
+            {m.name}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

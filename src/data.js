@@ -68,6 +68,16 @@ export const MOCK_DATA = {
     { id: "s-8835", model: "opus",   project: "arch-decisions",       tokens: 18_200, when: "45 min ago", dur: "1:52" },
   ],
 
+  weekly: {
+    current: 8_200_000,
+    avg_4w: 7_600_000,
+  },
+
+  window_5h: {
+    current: 1_240_000,
+    avg: 980_000,
+  },
+
   alerts: [
     { type: "warn", msg: "Opus 用量已達 36.9% — 預計 04/24 耗盡", ts: "12:41" },
     { type: "info", msg: "Haiku 無上限，目前花費 $9.57", ts: "14:02" },

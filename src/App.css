@@ -192,42 +192,58 @@ button { font-family: inherit; color: inherit; background: none; border: 0; curs
 }
 .tweaks-toggle:hover { background: var(--bg-hover); color: var(--text); }
 
-/* ============== Weekly bar ============== */
-.weekly-bar {
-  padding: 10px var(--pad) 11px;
+/* ============== Quota bars ============== */
+.quota-bars {
+  padding: 10px var(--pad) 12px;
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border);
 }
 
-.weekly-bar-labels {
+.quota-bars.two-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.quota-bar-group {
+  padding: 4px 0;
+}
+
+.quota-bar-group + .quota-bar-group {
+  border-top: 1px dashed var(--border);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.quota-bar-row {
   display: flex;
   align-items: baseline;
   gap: 10px;
   margin-bottom: 7px;
 }
 
-.weekly-bar-title {
+.quota-bar-title {
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.08em;
   color: var(--text-dim);
 }
 
-.weekly-bar-nums {
+.quota-bar-nums {
   font-family: var(--font-mono);
   font-size: 11.5px;
   color: var(--text-muted);
   flex: 1;
 }
 
-.weekly-bar-pct {
+.quota-bar-pct {
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 600;
   transition: color 0.3s;
 }
 
-.weekly-bar-track {
+.quota-bar-track {
   height: 3px;
   background: var(--bg-hover);
   border-radius: 2px;
@@ -235,11 +251,220 @@ button { font-family: inherit; color: inherit; background: none; border: 0; curs
   position: relative;
 }
 
-.weekly-bar-fill {
+.quota-bar-fill {
   height: 100%;
   border-radius: 2px;
   transition: width 0.7s var(--ease), background 0.3s;
 }
+
+.quota-warn {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--warn);
+  letter-spacing: 0.3px;
+}
+
+/* ============== Onboarding modal ============== */
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.onboarding-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+}
+
+.onboarding-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.onboarding-heading {
+  font-size: 22px;
+  font-weight: 640;
+  letter-spacing: -0.4px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.onboarding-sub {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.mode-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.mode-card {
+  text-align: left;
+  padding: 18px;
+  background: var(--bg-inset);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s var(--ease);
+}
+
+.mode-card:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-hover);
+}
+
+.mode-card.selected {
+  border-color: var(--accent);
+  background: oklch(from var(--accent) l c h / 0.06);
+}
+
+.mode-card-icon {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: var(--text-muted);
+}
+
+.mode-card.selected .mode-card-icon { color: var(--accent); }
+
+.mode-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.mode-card-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.onboarding-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.onboarding-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.onboarding-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.onboarding-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.onboarding-prefix {
+  position: absolute;
+  left: 14px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.onboarding-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.15s var(--ease);
+  box-sizing: border-box;
+}
+
+.onboarding-input.with-prefix { padding-left: 26px; }
+.onboarding-input:focus { border-color: var(--accent); }
+
+.onboarding-btn {
+  margin-top: 8px;
+  padding: 13px 20px;
+  background: var(--accent);
+  color: oklch(0.16 0.005 260);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  transition: all 0.15s var(--ease);
+  text-align: center;
+}
+
+.onboarding-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* Tweaks panel additions */
+.tweak-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0;
+}
+
+.tweak-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.tweak-input-prefix {
+  position: absolute;
+  left: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.tweak-input {
+  width: 100%;
+  padding: 7px 10px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s var(--ease);
+  box-sizing: border-box;
+}
+
+.tweak-input.with-prefix { padding-left: 20px; }
+.tweak-input:focus { border-color: var(--accent); }
 
 /* ============== Bento grid ============== */
 .bento {
